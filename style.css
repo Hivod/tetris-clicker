@@ -5,18 +5,13 @@ html {
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 62.5%;
-  background: rgb(71, 68, 93);
+  background: rgb(43, 42, 51);
   margin: 0;
+  overflow: hidden;
 }
 
 main {
   margin: 0 auto;
-}
-
-canvas {
-  border: 6px solid #393939;
-  display: block;
-  margin: 10px auto;
 }
 
 h1 {
@@ -29,14 +24,84 @@ h1 {
   text-shadow: -4px 0 black, 0 4px black, 4px 0 black, 0 -4px black;
 }
 
-#gameovertext {
+p {
   font-family: "Press Start 2P";
   text-shadow: -4px 0 black, 0 4px black, 4px 0 black, 0 -4px black;
   color: white;
   text-align: center;
   font-size: 4em;
-  position: absolute;
-  width: 100vw;
-  z-index: 1;
-  top: 40vh;
+}
+
+#gameovertext, #gameoversub {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  margin: 12px 0;
+  top: -600px;
+}
+
+#gameoversub {
+  font-size: 2.4em;
+}
+
+.column {
+  float: left;
+  width: 37.5%;
+  height: 100vh;
+  margin: 0;
+}
+
+#canvasdiv {
+  background: #fff;
+  width: 47.6vh;
+}
+
+#canvas {
+  border: 0px solid #393939;
+  border-top: 0;
+  border-bottom: 0;
+  display: block;
+  width: 47.6vh;
+}
+
+#clickerbutton {
+  display: block;
+  margin: 0 auto;
+  margin-top: 300px;
+  width: 200px;
+  height: 200px;
+  transition-duration: 100ms;
+  background: red;
+  border: 0;
+}
+
+#clickerbutton:hover {
+  transform: scale(1.1);
+}
+
+#clickerbutton:active {
+  transform: scale(1);
+}
+
+#clickerimage {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: -1px -10px;
+}
+
+#buttonlock {
+  position: relative;
+  left: -6px;
+  top: -202px;
+  opacity: 0;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(3600deg);
+  }
 }
