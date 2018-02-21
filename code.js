@@ -2,11 +2,11 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const scoreText = document.getElementById("score");
 const totalScoreText = document.getElementById("totalscore");
-const gameOverText = document.getElementById("gameovertext");
-const gameOverSub = document.getElementById("gameoversub");
+const screenText1 = document.getElementById("screentext");
+const screenText2 = document.getElementById("screentexttwo");
 const button = document.getElementById("clickerbutton");
 const buttonLock = document.getElementById("buttonlock");
-const tetroAmountText = document.getElementById("tetroamount");
+const blockAmountText = document.getElementById("blockamount");
 const scale = 40;
 var downScale = 5;
 var score = 0;
@@ -14,6 +14,9 @@ var totalScore = 0;
 ctx.scale(scale, scale);
 ctx.fillStyle = "black"
 ctx.fillRect(0, 0, canvas.width / scale, canvas.height / scale);
+
+document.getElementById("leftsidebar").style.width = (window.innerWidth - (window.innerHeight * 0.476)) / 2 + "px";
+document.getElementById("rightsidebar").style.width = (window.innerWidth - (window.innerHeight * 0.476)) / 2 + "px";
 
 function drawBlock(x, y, color) {
   if (color == 1) { //red
@@ -187,10 +190,11 @@ function moveDown() {
     placeTetro(arena, player);
     player.y = 0;
     player.x = 4;
+    blockAmount -= 4;
+    blockAmountText.textContent = "BLOCKS: " + blockAmount;
     rand = Math.floor(Math.random() * 7);
     player.tetro = tetrominos[rand];
     player.color = rand + 1;
-    tetroAmountText.textContent = "TETROMINOS: " + --tetroAmount;
   }
 }
 
@@ -217,37 +221,38 @@ function gameOver() {
       return true;
     }
   }
-  if (tetroAmount <= 0) {
+  if (blockAmount < 4) {
     return true;
   }
   return false;
 }
 
 function endGame() {
-  if (tetroAmount <= 0) {
-    gameOverText.textContent = "NO TETROMINOS LEFT";
+  if (blockAmount < 4) {
+    screenText1.textContent = "NO BLOCKS LEFT";
   } else {
-    gameOverText.textContent = "GAME OVER";
+    screenText1.textContent = "GAME OVER";
   }
-  gameOverSub.textContent = "click to try again";
-  buttonLock.style.opacity = 0;
+  screenText2.textContent = "click to play again";
+  buttonLock.style.display = "none";
   totalScore += score;
   totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
 }
 
-gameOverText.textContent = "CLICK TO PLAY";
+screenText1.textContent = "CLICK TO PLAY";
 
 canvas.addEventListener("click", function() {
-  if (gameLost && tetroAmount >= 10) {
+  if (gameLost && blockAmount >= 12) {
     gameLost = false;
-    gameOverText.textContent = "";
-    gameOverSub.textContent = "";
-    buttonLock.style.opacity = "1";
+    screenText1.textContent = "";
+    screenText2.textContent = "";
+    buttonLock.style.display = "block";
     score = 0;
+    scoreText.textContent = "SCORE: " + score;
     arena = createMatrix(10, 21);
     update();
-  } else if (gameLost && tetroAmount < 10) {
-    gameOverSub.textContent = "need at least 10 tetrominos to play";
+  } else if (gameLost && blockAmount < 12) {
+    screenText2.textContent = "need at least 12 blocks to play";
   }
 });
 
@@ -282,8 +287,8 @@ function update(time = 0) {
 
 // CLICKER BUTTON
 
-var tetroAmount = 10;
-var tetroPerClick = 1;
+var blockAmount = 12;
+var blocksPerClick = 1;
 
 function randomColor(element) {
   var val = 255+64;
@@ -299,7 +304,7 @@ function randomColor(element) {
 
 button.addEventListener("click", function() {
   if (gameLost) {
-    tetroAmountText.textContent = "TETROMINOS: " + ++tetroAmount;
+    blockAmountText.textContent = "BLOCKS: " + ++blockAmount;
     randomColor(button);
   }
 });

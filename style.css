@@ -1,3 +1,11 @@
+* {
+  padding: 0;
+}
+
+*:focus {
+  outline: none;
+}
+
 html {
   font-size: 16px;
 }
@@ -32,7 +40,7 @@ p {
   font-size: 4em;
 }
 
-#gameovertext, #gameoversub {
+#screentext, #screentexttwo {
   position: relative;
   display: inline-block;
   width: 100%;
@@ -40,7 +48,7 @@ p {
   top: -600px;
 }
 
-#gameoversub {
+#screentexttwo {
   font-size: 2.4em;
 }
 
@@ -68,8 +76,8 @@ p {
   display: block;
   margin: 0 auto;
   margin-top: 300px;
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   transition-duration: 100ms;
   background: red;
   border: 0;
@@ -85,16 +93,14 @@ p {
 
 #clickerimage {
   position: relative;
-  width: 200px;
-  height: 200px;
-  margin: -1px -10px;
+  width: 150px;
+  height: 150px;
 }
 
 #buttonlock {
   position: relative;
-  left: -6px;
-  top: -202px;
-  opacity: 0;
+  margin: -102% 0 0 0;
+  display: none;
 }
 
 @keyframes rotate {
