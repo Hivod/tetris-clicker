@@ -80,7 +80,7 @@ const tetrominos = [
   [7, 7]]
 ];
 
-var rand = Math.floor(Math.random() * 7);
+var rand = Math.floor(Math.random() * tetrominos.length);
 var player = {
   x: 4,
   y: 0,
@@ -130,6 +130,10 @@ function rotate() {
     }
   }
   arr.reverse();
+  while (arr[0].every(function(val) {return val == 0})) {
+    arr.splice(0, 1);
+    arr.push(new Array(arr[0].length).fill(0));
+  }
   return arr;
 }
 
@@ -189,12 +193,12 @@ function moveDown() {
     player.y--;
     placeTetro(arena, player);
     player.y = 0;
-    player.x = 4;
-    blockAmount -= 4;
-    blockAmountText.textContent = "BLOCKS: " + blockAmount;
-    rand = Math.floor(Math.random() * 7);
     player.tetro = tetrominos[rand];
     player.color = rand + 1;
+    player.x = (arena[0].length / 2 | 0) - (player.tetro[0].length / 2 | 0);
+    blockAmount -= 4;
+    blockAmountText.textContent = "BLOCKS: " + blockAmount;
+    rand = Math.floor(Math.random() * tetrominos.length);
   }
 }
 
