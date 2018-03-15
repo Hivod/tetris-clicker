@@ -161,20 +161,29 @@ canvas {
 
 #upgradeshop::-webkit-scrollbar-thumb, #buildingshop::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.5);
+  border-radius: 5px;
 }
 
 div.upgrade, div.building {
   width: 100px;
   height: 100px;
   float: left;
-  margin: 8px;
+  margin: 4px;
   background: #262638;
   border: 3px solid #531010;
   border-radius: 0%;
 }
 
 div.building {
+  width: 95%;
+  height: 60px;
   border: 3px solid #101d53;
+  margin: 3px 8px;
+}
+
+img.building {
+  height: 60px;
+  width: 60px;
 }
 
 div.upgrade:hover {
