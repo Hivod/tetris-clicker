@@ -1,9 +1,9 @@
 document.getElementById("buttondiv").style.width = (window.innerWidth - (window.innerHeight * 0.476)) / 2 + "px";
-//document.getElementById("leftsidebar").style.width = (window.innerWidth - (window.innerHeight * 0.476)) / 2 + "px";
+document.getElementById("shopdiv").style.width = (window.innerWidth - (window.innerHeight * 0.476)) / 2 + "px";
 setInterval(function() {
   document.getElementById("buttondiv").style.width = (window.innerWidth - (window.innerHeight * 0.476)) / 2 + "px";
-  //document.getElementById("rightsidebar").style.width = (window.innerWidth - (window.innerHeight * 0.476)) / 2 + "px";
-}, 1);
+  document.getElementById("shopdiv").style.width = (window.innerWidth - (window.innerHeight * 0.476)) / 2 + "px";
+}, 10);
 
 /*
   TETRIS
@@ -160,7 +160,7 @@ function sendDown() {
   /* moves player as far down as possible instantly */
   while (!checkCollision(arena, player.tetrominos[0])) {
     player.y++;
-    if (!dropCounterHasReset) {
+    if (!dropCounterHasReset && !gameLost) {
       dropCounter = dropInterval - 80;
       dropCounterHasReset = true;
     }
@@ -209,15 +209,13 @@ function placeTetro(arena, player) {
 
 function newTetro() {
   /* removes player's current tetromino, gives player a new tetromino, and resets position */
-  if (blockAmount - 4 >= 0) {
-    player.tetrominos.splice(0, 1);
-    player.tetrominos.push(getRandomTetrominos(1)[0]);
-    player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
-    player.y = 0;
-    blockAmount -= 4;
-    blockAmountText.textContent = "BLOCKS: " + blockAmount;
-    dropCounterHasReset = false;
-  }
+  player.tetrominos.splice(0, 1);
+  player.tetrominos.push(getRandomTetrominos(1)[0]);
+  player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
+  player.y = 0;
+  blockAmount -= 4;
+  if (blockAmount >= 0) blockAmountText.textContent = "BLOCKS: " + blockAmount;
+  dropCounterHasReset = false;
 }
 
 function rowFull(arr) {
@@ -243,7 +241,7 @@ function clearRows(arena) {
 function gameOver() {
   /* return true if blocks are touching top of arena */
   for (var i = 0; i < arena[0].length; i++) {
-    if (arena[0][i] != 0 || blockAmount <= 3) {
+    if (arena[0][i] != 0 || blockAmount <= 0) {
       return true;
     }
   }
@@ -252,16 +250,17 @@ function gameOver() {
 
 function startGame() {
   if (blockAmount >= 12) {
-    paused = false;
     gameLost = false;
+    paused = false;
+    dropInterval = startingSpeed;
     arena = createMatrix(10, 21); /* reset arena */
     arena.push(new Array(arenaSize).fill(9));
     player.tetrominos = getRandomTetrominos(playerTetrominoArrayLength); /* reset player's tetromino array */
     player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
     player.y = 0;
-    dropInterval = startingSpeed;
     blockAmount -= 4;
     blockAmountText.textContent = "BLOCKS: " + blockAmount;
+    document.getElementById("buttonlock").style.display = "block";
     clearInterval(gameOverAnimation);
     score = 0;
     update();
@@ -271,12 +270,24 @@ function startGame() {
 }
 
 function endGame() {
-  screenText.textContent = "GAME OVER";
-  if (blockAmount <= 0) screenText.textContent = "NO MORE BLOCKS!";
+  totalScore += score;
+  document.getElementById("totalscore").textContent = "TOTAL SCORE: " + totalScore;
+  if (blockAmount < 0) {
+    blockAmount += 4;
+    blockAmountText.textContent = "BLOCKS: " + blockAmount;
+  }
+  if (blockAmount < 4) {
+    screenText.textContent = "NO MORE BLOCKS!";
+  } else {
+    screenText.textContent = "GAME OVER";
+  }
   screenText2.textContent = "SCORE: " + score;
   setTimeout(function () {
-    screenText.textContent = "PRESS SPACE TO START";
+    screenText.textContent = "PRESS SPACE TO PLAY AGAIN";
   }, 5000);
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, 10, 2);
+  document.getElementById("buttonlock").style.display = "none";
   var index = 0;
   gameOverAnimation = setInterval(function () {
     if (index < arena.length * arena[0].length) {
@@ -370,10 +381,15 @@ ctx.fillRect(0, 0, canvas.height / ((arenaSize * 2.1 | 0) | 0), canvas.width / a
 const button = document.getElementById("clickerbutton");
 const blockAmountText = document.getElementById("blockamounttext");
 var blockAmount = 20;
+var totalScore = 0;
+
+button.style.background = randomColor();
 
 button.addEventListener("click", function() {
-  blockAmountText.textContent = "BLOCKS: " + blockAmount++;
-  button.style.background = randomColor();
+  if (gameLost) {
+    blockAmountText.textContent = "BLOCKS: " + blockAmount++;
+    button.style.background = randomColor();
+  }
 })
 
 function randomColor() {
