@@ -1,0 +1,185 @@
+* {
+  padding: 0;
+}
+
+*:focus {
+  outline: none;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 62.5%;
+  background: rgb(43, 42, 51);
+  margin: 0;
+  overflow: hidden;
+}
+
+main {
+  margin: 0 auto;
+}
+
+h1 {
+  margin: 30px 0 0 0;
+  font-size: 4em;
+  font-weight: 100;
+  color: white;
+  text-align: center;
+  font-family: "Press Start 2P";
+  text-shadow: -4px 0 black, 0 4px black, 4px 0 black, 0 -4px black;
+}
+
+p {
+  font-family: "Press Start 2P";
+  text-shadow: -4px 0 black, 0 4px black, 4px 0 black, 0 -4px black;
+  color: white;
+  text-align: center;
+  font-size: 4em;
+}
+
+#screentext, #screentexttwo {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  margin: 12px 0;
+  top: -600px;
+}
+
+#screentexttwo {
+  font-size: 2.4em;
+}
+
+.column {
+  float: left;
+  width: 37.5%;
+  height: 100vh;
+  margin: 0;
+}
+
+#canvasdiv {
+  background: #fff;
+  width: 47.6vh;
+}
+
+#canvas {
+  border: 0px solid #393939;
+  border-top: 0;
+  border-bottom: 0;
+  display: block;
+  width: 47.6vh;
+}
+
+#clickerbutton {
+  display: block;
+  margin: 0 auto;
+  margin-top: 300px;
+  width: 150px;
+  height: 150px;
+  transition-duration: 100ms;
+  background: red;
+  border: 0;
+}
+
+#clickerbutton:hover {
+  padding: 8px;
+  border: 8px solid white;
+}
+
+#clickerbutton:active {
+  border: 0;
+  transform: scale(1);
+}
+
+#clickerimage {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+#buttonlock {
+  position: relative;
+  margin: -102% 0 0 0;
+  display: none;
+}
+
+#shop {
+  width: 100.5%;
+  height: 88%;
+  background: black;
+  overflow-y: scroll;
+}
+
+#shop::-webkit-scrollbar {
+  background: transparent;
+  width: 10px;
+}
+
+#shop::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+}
+
+div.item {
+  width: 100px;
+  height: 100px;
+  float: left;
+  margin: 8px;
+  background: #262638;
+  border: 2px solid red;
+  border-radius: 10%;
+}
+
+div.item:hover {
+  transform: scale(1.1)
+}
+
+div.item:active {
+  transform: scale(1)
+}
+
+img.item {
+  border-radius: 8%;
+}
+
+.animate {
+  opacity: 0;
+  height: 50px;
+  width: 50px;
+  background: red;
+  position: relative;
+  display: inline-block;
+  animation: float 1000ms 1;
+}
+
+.animationdiv {
+  width: 0;
+  height: 0;
+  display: inline;
+  float: left;
+  top: -153px;
+  background: rgba(0,0,0,0.5);
+  position: relative;
+}
+
+@keyframes float {
+  from {
+    top: 0;
+    opacity: 1;
+  }
+  to {
+    top: -200px;
+    opacity: 0;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(3600deg);
+  }
+}
