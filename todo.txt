@@ -1,0 +1,18 @@
+block building:
+ger block
+
+tetris building:
+ger ett antal poäng per sek, tar ett antal block
+rng?
+
+tetromino upgrade:
+knappen ger tetros i stället för blocks
+
+score upgrade:
+låser upp BOOM TETRIS
+
+ghost upgrade:
+ger en spökbild av var current tetro droppar
+
+next upgrade (1-5), hold upgrade:
+se kommande tetros, hold slot

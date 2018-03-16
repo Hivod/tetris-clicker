@@ -23,7 +23,8 @@ const colors = ["rgb(14, 0, 88)", /* dark blue */
                 "rgb(0, 0, 255)", /* blue, S tetro */
                 "rgb(255, 0, 255)", /* pink, Z tetro */
                 "rgb(255, 255, 0)", /* yellow, I tetro */
-                "rgb(127, 0, 255)"]; /* purple, O tetro */
+                "rgb(127, 0, 255)", /* purple, O tetro */
+                "rgba(109, 124, 173, 0.4)"]; /* ghost, ghost tetro */
 const tetrominos = [
   //L tetro
  [[1, 1, 1],
@@ -188,6 +189,18 @@ function checkCollision(matrix1, matrix2) {
   return false;
 }
 
+function checkCollisionAtPosition(matrix1, matrix2, x2, y2) {
+  /* returns true if matrix1 and matrix2 overlaps at (x2, y2) */
+  for (var y = 0; y < matrix2.length; y++) {
+    for (var x = 0; x < matrix2[y].length; x++) {
+      if (matrix2[y][x] != 0 && (matrix1[y2 + y] && matrix1[y + y2][x + x2] != 0)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 function placeTetro(arena, player) {
   /* adds player's tetromino to arena at player's current position */
   var color;
@@ -213,7 +226,7 @@ function newTetro() {
   player.tetrominos.push(getRandomTetrominos(1)[0]);
   player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
   player.y = 0;
-  if (!upgrades[1].bought) {
+  if (!upgrades[0].bought) {
     blockAmount -= 4;
   } else {
     blockAmount--;
@@ -262,7 +275,7 @@ function startGame() {
     player.tetrominos = getRandomTetrominos(playerTetrominoArrayLength); /* reset player's tetromino array */
     player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
     player.y = 0;
-    if (!upgrades[1].bought) {
+    if (!upgrades[0].bought) {
       blockAmount -= 4;
     } else {
       blockAmount--;
@@ -273,7 +286,7 @@ function startGame() {
     clearInterval(gameOverAnimation);
     score = 0;
     update();
-  } else if(!upgrades[1].bought) {
+  } else if(!upgrades[0].bought) {
     screenText.textContent = "NEED AT LEAST 12 BLOCKS TO PLAY";
   } else {
     screenText.textContent = "NEED AT LEAST 3 TETROMINOS TO PLAY"
@@ -287,7 +300,7 @@ function endGame() {
     blockAmount += startingBlocks / 3;
     blockAmountText.textContent = blockText + blockAmount;
   }
-  if (!upgrades[1].bought) {
+  if (!upgrades[0].bought) {
     if (blockAmount < 4) {
       screenText.textContent = "NO MORE BLOCKS!";
     } else {
@@ -338,6 +351,20 @@ function update(time = 0) {
     ctx.fillRect(0, 0, canvas.height / ((arenaSize * 2.1 | 0) | 0), canvas.width / arenaSize);
     drawMatrix(arena, 0, 0);
     drawMatrix(player.tetrominos[0], player.x, player.y);
+    if (upgrades[1].bought) {
+      let y = 0;
+      while (!checkCollisionAtPosition(arena, player.tetrominos[0], player.x, y)) {
+        y++;
+      }
+      y--;
+      for (var row = 0; row < player.tetrominos[0].length; row++) {
+        for (var i = 0; i < player.tetrominos[0][row].length; i++) {
+          if (player.tetrominos[0][row][i] != 0) {
+            drawBlock(i + player.x, row + y, 8, 0.5);
+          }
+        }
+      }
+    }
   } else {
     screenText.textContent = "PAUSED";
     screenText2.textContent = "PRESS SPACE TO RESUME";
@@ -465,7 +492,7 @@ function addBuildingToShop(building) {
 }
 
 upgrades.forEach(function (element) {
-  addUpgradeToShop(element);
+  if (!element.bought) addUpgradeToShop(element);
 });
 buildings.forEach(function (element) {
   addBuildingToShop(element);
@@ -489,8 +516,8 @@ addBuildingToShop({name: "item"});
 
 /*
   SAVE GAME
-*/
-/*
+
+
 function createCookie(name,value,days) {
     var expires = "";
     if (days) {
@@ -516,15 +543,6 @@ function eraseCookie(name) {
     createCookie(name,"",-1);
 }
 
-setInterval(function () {
-  createCookie("blockAmount", blockAmount);
-  createCookie("totalScore", totalScore);
-  upgrades.forEach(function (element, index, arr) {
-    createCookie(element.name + "Bought", element.bought);
-  });
-  createCookie("isSaved", true);
-}, 1000);
-
 if(readCookie("isSaved")) {
   blockAmount = parseInt(readCookie("blockAmount"));
   blockAmountText.textContent = blockText + blockAmount;
@@ -533,13 +551,20 @@ if(readCookie("isSaved")) {
   for (var i = 0; i < upgrades.length; i++) {
     upgrades[i].bought = readCookie(upgrades[i].name + "Bought");
     debugger;
-  }*//*
-  upgrades.forEach(function(element, index, arr) {
-    arr[index].bought = readCookie(element.name + "Bought");
-    debugger;
-  });*//*
+  }
 }
-if (upgrades[1].bought == true) {
+
+setInterval(function () {
+  createCookie("blockAmount", blockAmount);
+  createCookie("totalScore", totalScore);
+  for (var i = 0; i < upgrades.length; i++) {
+    debugger;
+    createCookie(upgrades[i].name + "Bought", upgrades[i].bought);
+  }
+  createCookie("isSaved", true);
+}, 1000);
+
+if (upgrades[0].bought == true) {
   blockText = "TETROMINOS: ";
   blockAmountText.textContent = blockText + blockAmount;
   startingBlocks = 3;
@@ -565,4 +590,5 @@ document.getElementById("reset").addEventListener("click", function() {
   blockText = "BLOCKS: ";
   blockAmountText.textContent = blockText + blockAmount;
   totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
-});*/
+});
+*/
