@@ -261,6 +261,7 @@ function startGame() {
     blockAmount -= 4;
     blockAmountText.textContent = "BLOCKS: " + blockAmount;
     document.getElementById("buttonlock").style.display = "block";
+    button.style.pointerEvents = "none";
     clearInterval(gameOverAnimation);
     score = 0;
     update();
@@ -288,6 +289,7 @@ function endGame() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, 10, 2);
   document.getElementById("buttonlock").style.display = "none";
+  button.style.pointerEvents = "auto";
   var index = 0;
   gameOverAnimation = setInterval(function () {
     if (index < arena.length * arena[0].length) {
@@ -382,12 +384,14 @@ const button = document.getElementById("clickerbutton");
 const blockAmountText = document.getElementById("blockamounttext");
 var blockAmount = 20;
 var totalScore = 0;
+var upgrades = [{name: "ghost", unlocked: false}, {name: "tetromino", unlocked: false}];
+var buildings = [];
 
 button.style.background = randomColor();
 
 button.addEventListener("click", function() {
   if (gameLost) {
-    blockAmountText.textContent = "BLOCKS: " + blockAmount++;
+    blockAmountText.textContent = "BLOCKS: " + ++blockAmount;
     button.style.background = randomColor();
   }
 })
@@ -406,3 +410,30 @@ function randomColor() {
   var blue = val;
   return "rgb(" + red + "," + green + "," + blue + ")";
 }
+
+function addUpgradeToShop(upgrade) {
+  let div = document.createElement("div");
+  let img = document.createElement("img");
+  div.className = "upgrade";
+  img.src = "resources/" + upgrade.name + ".png";
+  img.className = "upgrade";
+  div.appendChild(img);
+  document.getElementById("upgradeshop").appendChild(div);
+}
+
+function addBuildingToShop(building) {
+  let div = document.createElement("div");
+  let img = document.createElement("img");
+  div.className = "building";
+  img.src = "resources/" + building.name + ".png";
+  img.className = "building";
+  div.appendChild(img);
+  document.getElementById("buildingshop").appendChild(div);
+}
+
+addUpgradeToShop({name: "item"});
+addUpgradeToShop({name: "item"});
+addUpgradeToShop({name: "item"});
+addBuildingToShop({name: "item"});
+addBuildingToShop({name: "item"});
+addBuildingToShop({name: "item"});
