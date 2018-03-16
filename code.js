@@ -213,8 +213,12 @@ function newTetro() {
   player.tetrominos.push(getRandomTetrominos(1)[0]);
   player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
   player.y = 0;
-  blockAmount -= 4;
-  if (blockAmount >= 0) blockAmountText.textContent = "BLOCKS: " + blockAmount;
+  if (!upgrades[1].bought) {
+    blockAmount -= 4;
+  } else {
+    blockAmount--;
+  }
+  if (blockAmount >= 0) blockAmountText.textContent = blockText + blockAmount;
   dropCounterHasReset = false;
 }
 
@@ -241,7 +245,7 @@ function clearRows(arena) {
 function gameOver() {
   /* return true if blocks are touching top of arena */
   for (var i = 0; i < arena[0].length; i++) {
-    if (arena[0][i] != 0 || blockAmount <= 0) {
+    if (arena[0][i] != 0 || blockAmount < 0) {
       return true;
     }
   }
@@ -249,7 +253,7 @@ function gameOver() {
 }
 
 function startGame() {
-  if (blockAmount >= 12) {
+  if (blockAmount >= startingBlocks) {
     gameLost = false;
     paused = false;
     dropInterval = startingSpeed;
@@ -258,29 +262,37 @@ function startGame() {
     player.tetrominos = getRandomTetrominos(playerTetrominoArrayLength); /* reset player's tetromino array */
     player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
     player.y = 0;
-    blockAmount -= 4;
-    blockAmountText.textContent = "BLOCKS: " + blockAmount;
+    if (!upgrades[1].bought) {
+      blockAmount -= 4;
+    } else {
+      blockAmount--;
+    }
+    blockAmountText.textContent = blockText + blockAmount;
     document.getElementById("buttonlock").style.display = "block";
     button.style.pointerEvents = "none";
     clearInterval(gameOverAnimation);
     score = 0;
     update();
-  } else {
+  } else if(!upgrades[1].bought) {
     screenText.textContent = "NEED AT LEAST 12 BLOCKS TO PLAY";
+  } else {
+    screenText.textContent = "NEED AT LEAST 3 TETROMINOS TO PLAY"
   }
 }
 
 function endGame() {
   totalScore += score;
-  document.getElementById("totalscore").textContent = "TOTAL SCORE: " + totalScore;
+  totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
   if (blockAmount < 0) {
-    blockAmount += 4;
-    blockAmountText.textContent = "BLOCKS: " + blockAmount;
+    blockAmount += startingBlocks / 3;
+    blockAmountText.textContent = blockText + blockAmount;
   }
-  if (blockAmount < 4) {
-    screenText.textContent = "NO MORE BLOCKS!";
-  } else {
-    screenText.textContent = "GAME OVER";
+  if (!upgrades[1].bought) {
+    if (blockAmount < 4) {
+      screenText.textContent = "NO MORE BLOCKS!";
+    } else {
+      screenText.textContent = "GAME OVER";
+    }
   }
   screenText2.textContent = "SCORE: " + score;
   setTimeout(function () {
@@ -382,16 +394,19 @@ ctx.fillRect(0, 0, canvas.height / ((arenaSize * 2.1 | 0) | 0), canvas.width / a
 
 const button = document.getElementById("clickerbutton");
 const blockAmountText = document.getElementById("blockamounttext");
+const totalScoreText = document.getElementById("totalscore");
 var blockAmount = 20;
+var blockText = "BLOCKS: ";
+var startingBlocks = 12;
 var totalScore = 0;
-var upgrades = [{name: "ghost", unlocked: false}, {name: "tetromino", unlocked: false}];
+var upgrades = [{name: "tetrominoUpgrade", cost: 10, bought: false}, {name: "ghostUpgrade", cost: 100, bought: false}];
 var buildings = [];
 
 button.style.background = randomColor();
 
 button.addEventListener("click", function() {
   if (gameLost) {
-    blockAmountText.textContent = "BLOCKS: " + ++blockAmount;
+    blockAmountText.textContent = blockText + ++blockAmount;
     button.style.background = randomColor();
   }
 })
@@ -414,11 +429,29 @@ function randomColor() {
 function addUpgradeToShop(upgrade) {
   let div = document.createElement("div");
   let img = document.createElement("img");
+  let cost = document.createElement("p");
   div.className = "upgrade";
   img.src = "resources/" + upgrade.name + ".png";
   img.className = "upgrade";
+  cost.className = "upgrade";
+  cost.textContent = upgrade.cost;
   div.appendChild(img);
+  div.appendChild(cost);
+  div.id = upgrade.name;
   document.getElementById("upgradeshop").appendChild(div);
+  div.addEventListener("click", function() {
+    if (totalScore >= upgrade.cost) {
+      totalScore -= upgrade.cost;
+      totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
+      upgrade.bought = true;
+      document.getElementById("upgradeshop").removeChild(div);
+      if (upgrade.name == "tetrominoUpgrade") {
+        blockText = "TETROMINOS: ";
+        blockAmountText.textContent = blockText + blockAmount;
+        startingBlocks = 3;
+      }
+    }
+  })
 }
 
 function addBuildingToShop(building) {
@@ -431,9 +464,105 @@ function addBuildingToShop(building) {
   document.getElementById("buildingshop").appendChild(div);
 }
 
-addUpgradeToShop({name: "item"});
-addUpgradeToShop({name: "item"});
-addUpgradeToShop({name: "item"});
+upgrades.forEach(function (element) {
+  addUpgradeToShop(element);
+});
+buildings.forEach(function (element) {
+  addBuildingToShop(element);
+})
+
+/* TEST ITEMS */
+addUpgradeToShop({name: "item", cost: 0, bought: false});
+addUpgradeToShop({name: "item", cost: 0, bought: false});
+addUpgradeToShop({name: "item", cost: 0, bought: false});
+addUpgradeToShop({name: "item", cost: 0, bought: false});
+addUpgradeToShop({name: "item", cost: 0, bought: false});
+addUpgradeToShop({name: "item", cost: 0, bought: false});
+addUpgradeToShop({name: "item", cost: 0, bought: false});
+addUpgradeToShop({name: "item", cost: 0, bought: false});
 addBuildingToShop({name: "item"});
 addBuildingToShop({name: "item"});
 addBuildingToShop({name: "item"});
+addBuildingToShop({name: "item"});
+addBuildingToShop({name: "item"});
+
+
+/*
+  SAVE GAME
+*/
+/*
+function createCookie(name,value,days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+
+function eraseCookie(name) {
+    createCookie(name,"",-1);
+}
+
+setInterval(function () {
+  createCookie("blockAmount", blockAmount);
+  createCookie("totalScore", totalScore);
+  upgrades.forEach(function (element, index, arr) {
+    createCookie(element.name + "Bought", element.bought);
+  });
+  createCookie("isSaved", true);
+}, 1000);
+
+if(readCookie("isSaved")) {
+  blockAmount = parseInt(readCookie("blockAmount"));
+  blockAmountText.textContent = blockText + blockAmount;
+  totalScore = parseInt(readCookie("totalScore"));
+  totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
+  for (var i = 0; i < upgrades.length; i++) {
+    upgrades[i].bought = readCookie(upgrades[i].name + "Bought");
+    debugger;
+  }*//*
+  upgrades.forEach(function(element, index, arr) {
+    arr[index].bought = readCookie(element.name + "Bought");
+    debugger;
+  });*//*
+}
+if (upgrades[1].bought == true) {
+  blockText = "TETROMINOS: ";
+  blockAmountText.textContent = blockText + blockAmount;
+  startingBlocks = 3;
+}
+
+upgrades.forEach(function(element, index, arr) {
+  if (element.bought == true) {
+    console.log(document.getElementById("upgradeshop").removeChild(document.getElementById(element.name)));
+  }
+});
+
+
+document.getElementById("reset").addEventListener("click", function() {
+  eraseCookie("blockAmount");
+  eraseCookie("totalScore");
+  eraseCookie("ghostUpgradeBought");
+  eraseCookie("tetrominoUpgradeBought");
+  eraseCookie("isSaved");
+  totalScore = 0;
+  blockAmount = 20;
+  upgrades = [{name: "tetrominoUpgrade", cost: 10, bought: false}, {name: "ghostUpgrade", cost: 100, bought: false}];
+  startingBlocks = 12;
+  blockText = "BLOCKS: ";
+  blockAmountText.textContent = blockText + blockAmount;
+  totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
+});*/
