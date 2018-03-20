@@ -464,7 +464,7 @@ ctx.fillRect(0, 0, canvas.height / ((arenaSize * 2.1 | 0) | 0), canvas.width / a
 const button = document.getElementById("clickerbutton");
 const blockAmountText = document.getElementById("blockamounttext");
 const totalScoreText = document.getElementById("totalscore");
-var blockAmount = "Infinity";
+var blockAmount = 40;
 var blockText = "BLOCKS: ";
 var startingBlocks = 12;
 var totalScore = 0;
