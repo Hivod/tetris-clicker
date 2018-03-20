@@ -60,9 +60,13 @@ const playerTetrominoArrayLength = 5;
 var startingSpeed = 800;
 var dropCounter = 0;
 var dropInterval = 0;
-var maxSpeed = 80;
+var maxSpeed = 120;
+var speedModifier = 1;
 var lastTime = 0;
+var rows = 0;
 var score = 0;
+var level = 0;
+var maxLevel = 5;
 var paused = false;
 var player = {
   x: 0,
@@ -226,7 +230,7 @@ function newTetro() {
   player.tetrominos.push(getRandomTetrominos(1)[0]);
   player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
   player.y = 0;
-  if (!upgrades[0].bought) {
+  if (!getUpgradeByName("tetrominoUpgrade").bought) {
     blockAmount -= 4;
   } else {
     blockAmount--;
@@ -255,6 +259,21 @@ function clearRows(arena) {
   return rows;
 }
 
+function drawGhostBlock() {
+  let y = 0;
+  while (!checkCollisionAtPosition(arena, player.tetrominos[0], player.x, y)) {
+    y++;
+  }
+  y--;
+  for (var row = 0; row < player.tetrominos[0].length; row++) {
+    for (var i = 0; i < player.tetrominos[0][row].length; i++) {
+      if (player.tetrominos[0][row][i] != 0) {
+        drawBlock(i + player.x, row + y, 8, 0.5);
+      }
+    }
+  }
+}
+
 function gameOver() {
   /* return true if blocks are touching top of arena */
   for (var i = 0; i < arena[0].length; i++) {
@@ -275,7 +294,7 @@ function startGame() {
     player.tetrominos = getRandomTetrominos(playerTetrominoArrayLength); /* reset player's tetromino array */
     player.x = Math.floor(arena[0].length / 2) - Math.floor(player.tetrominos[0][0].length / 2);
     player.y = 0;
-    if (!upgrades[0].bought) {
+    if (!getUpgradeByName("tetrominoUpgrade").bought) {
       blockAmount -= 4;
     } else {
       blockAmount--;
@@ -286,7 +305,7 @@ function startGame() {
     clearInterval(gameOverAnimation);
     score = 0;
     update();
-  } else if(!upgrades[0].bought) {
+  } else if(!getUpgradeByName("tetrominoUpgrade").bought) {
     screenText.textContent = "NEED AT LEAST 12 BLOCKS TO PLAY";
   } else {
     screenText.textContent = "NEED AT LEAST 3 TETROMINOS TO PLAY"
@@ -295,13 +314,13 @@ function startGame() {
 
 function endGame() {
   totalScore += score;
-  totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
+  totalScoreText.textContent = "TOTAL SCORE: " + abbreviate(totalScore, 2);
   if (blockAmount < 0) {
     blockAmount += startingBlocks / 3;
     blockAmountText.textContent = blockText + blockAmount;
   }
-  if (!upgrades[0].bought) {
-    if (blockAmount < 4) {
+  if (!getUpgradeByName("tetrominoUpgrade").bought) {
+    if (blockAmount < startingBlocks / 3) {
       screenText.textContent = "NO MORE BLOCKS!";
     } else {
       screenText.textContent = "GAME OVER";
@@ -340,30 +359,53 @@ function update(time = 0) {
       moveDown();
     }
     let clearedRows = clearRows(arena);
-    score += clearedRows;
-    dropInterval -= 20 * clearedRows;
-    if (dropInterval < maxSpeed) dropInterval = maxSpeed;
+    rows += clearedRows;
+    level = Math.floor(rows / 10);
+    switch(clearedRows) {
+      case 1:
+        score += 40 * (level + 1);
+        break;
+      case 2:
+        if (getUpgradeByName("twoRowUpgrade").bought) {
+          score += 100 * (level + 1);
+        } else {
+          score += 80 * (level + 1);
+        }
+        break;
+      case 3:
+        if (getUpgradeByName("threeRowUpgrade").bought) {
+          score += 300 * (level + 1);
+        } else {
+          score += 120 * (level + 1);
+        }
+        break;
+      case 4:
+        if (getUpgradeByName("tetrisUpgrade").bought) {
+          score += 1200 * (level + 1);
+        } else {
+          score += 160 * (level + 1);
+        }
+        break;
+    }
+    dropInterval = 800 - (level * (1000 / 60) * 10 * speedModifier);
+    if (dropInterval < maxSpeed) {
+      dropInterval = maxSpeed;
+    }
+    if (level > maxLevel) {
+      level = maxLevel;
+    }
+    document.getElementById("leveltext").textContent = "LV " + level;
     clearedRows = 0;
     scoreText.textContent = score;
     screenText.textContent = "";
     screenText2.textContent = "";
+    
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.height / ((arenaSize * 2.1 | 0) | 0), canvas.width / arenaSize);
     drawMatrix(arena, 0, 0);
     drawMatrix(player.tetrominos[0], player.x, player.y);
-    if (upgrades[1].bought) {
-      let y = 0;
-      while (!checkCollisionAtPosition(arena, player.tetrominos[0], player.x, y)) {
-        y++;
-      }
-      y--;
-      for (var row = 0; row < player.tetrominos[0].length; row++) {
-        for (var i = 0; i < player.tetrominos[0][row].length; i++) {
-          if (player.tetrominos[0][row][i] != 0) {
-            drawBlock(i + player.x, row + y, 8, 0.5);
-          }
-        }
-      }
+    if (getUpgradeByName("ghostUpgrade").bought) {
+      drawGhostBlock();
     }
   } else {
     screenText.textContent = "PAUSED";
@@ -422,11 +464,15 @@ ctx.fillRect(0, 0, canvas.height / ((arenaSize * 2.1 | 0) | 0), canvas.width / a
 const button = document.getElementById("clickerbutton");
 const blockAmountText = document.getElementById("blockamounttext");
 const totalScoreText = document.getElementById("totalscore");
-var blockAmount = 20;
+var blockAmount = "Infinity";
 var blockText = "BLOCKS: ";
 var startingBlocks = 12;
 var totalScore = 0;
-var upgrades = [{name: "tetrominoUpgrade", cost: 10, bought: false}, {name: "ghostUpgrade", cost: 100, bought: false}];
+var upgrades = [{name: "twoRowUpgrade", cost: 600, bought: false},
+                {name: "tetrominoUpgrade", cost: 1200, bought: false},
+                {name: "threeRowUpgrade", cost: 3600, bought: false},
+                {name: "ghostUpgrade", cost: 10000, bought: false},
+                {name: "tetrisUpgrade", cost: 12000, bought: false}];
 var buildings = [];
 
 button.style.background = randomColor();
@@ -437,6 +483,14 @@ button.addEventListener("click", function() {
     button.style.background = randomColor();
   }
 })
+
+function getUpgradeByName(name) {
+  for (var i = 0; i < upgrades.length; i++) {
+    if (upgrades[i].name == name) {
+      return upgrades[i];
+    }
+  }
+}
 
 function randomColor() {
   var val = 255 + 64;
@@ -453,6 +507,63 @@ function randomColor() {
   return "rgb(" + red + "," + green + "," + blue + ")";
 }
 
+function abbreviate(number, maxPlaces, forcePlaces, forceLetter) {
+  number = Number(number)
+  forceLetter = forceLetter || false
+  if(forceLetter !== false) {
+    return annotate(number, maxPlaces, forcePlaces, forceLetter)
+  }
+  var abbr
+  if(number >= 1e12) {
+    abbr = 'T'
+  }
+  else if(number >= 1e9) {
+    abbr = 'B'
+  }
+  else if(number >= 1e6) {
+    abbr = 'M'
+  }
+  else if(number >= 1e3) {
+    abbr = 'k'
+  }
+  else {
+    abbr = ''
+  }
+  return annotate(number, maxPlaces, forcePlaces, abbr)
+}
+
+function annotate(number, maxPlaces, forcePlaces, abbr) {
+  // set places to false to not round
+  var rounded = 0
+  switch(abbr) {
+    case 'T':
+      rounded = number / 1e12
+      break
+    case 'B':
+      rounded = number / 1e9
+      break
+    case 'M':
+      rounded = number / 1e6
+      break
+    case 'k':
+      rounded = number / 1e3
+      break
+    case '':
+      rounded = number
+      break
+  }
+  if(maxPlaces !== false) {
+    var test = new RegExp('\\.\\d{' + (maxPlaces + 1) + ',}$')
+    if(test.test(('' + rounded))) {
+      rounded = rounded.toFixed(maxPlaces)
+    }
+  }
+  if(forcePlaces !== false) {
+    rounded = Number(rounded).toFixed(forcePlaces)
+  }
+  return rounded + abbr
+}
+
 function addUpgradeToShop(upgrade) {
   let div = document.createElement("div");
   let img = document.createElement("img");
@@ -461,7 +572,7 @@ function addUpgradeToShop(upgrade) {
   img.src = "resources/" + upgrade.name + ".png";
   img.className = "upgrade";
   cost.className = "upgrade";
-  cost.textContent = upgrade.cost;
+  cost.textContent = abbreviate(upgrade.cost, 2);
   div.appendChild(img);
   div.appendChild(cost);
   div.id = upgrade.name;
@@ -469,7 +580,7 @@ function addUpgradeToShop(upgrade) {
   div.addEventListener("click", function() {
     if (totalScore >= upgrade.cost) {
       totalScore -= upgrade.cost;
-      totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
+      totalScoreText.textContent = "TOTAL SCORE: " + abbreviate(totalScore, 2);
       upgrade.bought = true;
       document.getElementById("upgradeshop").removeChild(div);
       if (upgrade.name == "tetrominoUpgrade") {
@@ -488,6 +599,7 @@ function addBuildingToShop(building) {
   img.src = "resources/" + building.name + ".png";
   img.className = "building";
   div.appendChild(img);
+  document.getElementById("buildingshop").appendChild(div);
   document.getElementById("buildingshop").appendChild(div);
 }
 
@@ -513,82 +625,16 @@ addBuildingToShop({name: "item"});
 addBuildingToShop({name: "item"});
 addBuildingToShop({name: "item"});
 
-
 /*
-  SAVE GAME
-
-
-function createCookie(name,value,days) {
-    var expires = "";
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days*24*60*60*1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + value + expires + "; path=/";
-}
-
-function readCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    }
-    return null;
-}
-
-function eraseCookie(name) {
-    createCookie(name,"",-1);
-}
-
-if(readCookie("isSaved")) {
-  blockAmount = parseInt(readCookie("blockAmount"));
-  blockAmountText.textContent = blockText + blockAmount;
-  totalScore = parseInt(readCookie("totalScore"));
-  totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
-  for (var i = 0; i < upgrades.length; i++) {
-    upgrades[i].bought = readCookie(upgrades[i].name + "Bought");
-    debugger;
-  }
-}
-
-setInterval(function () {
-  createCookie("blockAmount", blockAmount);
-  createCookie("totalScore", totalScore);
-  for (var i = 0; i < upgrades.length; i++) {
-    debugger;
-    createCookie(upgrades[i].name + "Bought", upgrades[i].bought);
-  }
-  createCookie("isSaved", true);
-}, 1000);
-
-if (upgrades[0].bought == true) {
-  blockText = "TETROMINOS: ";
-  blockAmountText.textContent = blockText + blockAmount;
-  startingBlocks = 3;
-}
-
-upgrades.forEach(function(element, index, arr) {
-  if (element.bought == true) {
-    console.log(document.getElementById("upgradeshop").removeChild(document.getElementById(element.name)));
-  }
-});
-
-
-document.getElementById("reset").addEventListener("click", function() {
-  eraseCookie("blockAmount");
-  eraseCookie("totalScore");
-  eraseCookie("ghostUpgradeBought");
-  eraseCookie("tetrominoUpgradeBought");
-  eraseCookie("isSaved");
-  totalScore = 0;
-  blockAmount = 20;
-  upgrades = [{name: "tetrominoUpgrade", cost: 10, bought: false}, {name: "ghostUpgrade", cost: 100, bought: false}];
-  startingBlocks = 12;
-  blockText = "BLOCKS: ";
-  blockAmountText.textContent = blockText + blockAmount;
-  totalScoreText.textContent = "TOTAL SCORE: " + totalScore;
-});
+localStorage.setItem("score", score);
+localStorage.getItem("score");
+localStorage.removeItem("score");
 */
+
+function removeFromShop() {
+  upgrades.forEach(function(item, index) {
+    if (item.bought) {
+      document.getElementById("upgradeshop").removeChild(document.getElementById(item.name));
+    }
+  });
+}

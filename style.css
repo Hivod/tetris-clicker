@@ -49,7 +49,7 @@ canvas {
   box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.75);
 }
 
-#scoretext {
+#scoretext, #leveltext {
   text-align: left;
   width: 47.6vh;
   height: 0;
@@ -57,6 +57,16 @@ canvas {
   margin: 10px auto 0;
   position: relative;
   font-size: 2.5em;
+}
+
+#leveltextdiv {
+  width: 100vw;
+  position: fixed;
+  bottom: 24px;
+  
+}
+#leveltext {
+  font-size: 2em;
 }
 
 #screentext, #screentext2 {
