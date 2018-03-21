@@ -304,6 +304,8 @@ function startGame() {
     button.style.pointerEvents = "none";
     clearInterval(gameOverAnimation);
     score = 0;
+    rows = 0;
+    level = 0;
     update();
   } else if(!getUpgradeByName("tetrominoUpgrade").bought) {
     screenText.textContent = "NEED AT LEAST 12 BLOCKS TO PLAY";
@@ -375,6 +377,8 @@ function update(time = 0) {
       case 3:
         if (getUpgradeByName("threeRowUpgrade").bought) {
           score += 300 * (level + 1);
+        } else if (getUpgradeByName("twoRowUpgrade").bought) {
+          score += 140 * (level + 1);
         } else {
           score += 120 * (level + 1);
         }
@@ -382,6 +386,10 @@ function update(time = 0) {
       case 4:
         if (getUpgradeByName("tetrisUpgrade").bought) {
           score += 1200 * (level + 1);
+        } else if (getUpgradeByName("twoRowUpgrade").bought) {
+          score += 200 * (level + 1);
+        } else if (getUpgradeByName("threeRowUpgrade").bought) {
+          score += 340 * (level + 1);
         } else {
           score += 160 * (level + 1);
         }
