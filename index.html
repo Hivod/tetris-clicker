@@ -10,7 +10,7 @@
   <link rel="icon" href="resources/particle.png" type="image/x-icon"/>
 </head>
 
-<body>
+<body class="game">
   <!-- huvudmeny -->
   <header>
 
@@ -18,23 +18,23 @@
   <!-- main content -->
   <main id="main">
     <div id="buttondiv">
-    <p id="reset">Reset</p>
+    <a href="about.html" id="about">About</a>
     <p id="blockamounttext">BLOCKS: 40</p>
       <div id="clickerbutton" tabindex="-1">
         <svg id="clickerimage" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 141.73 141.73"><defs><style>.cls-1{isolation:isolate;}.cls-2{fill:#fff;fill-opacity:0.75;}.cls-3,.cls-4{fill:#1d1d1b;mix-blend-mode:darken;}.cls-3{opacity:0.6;}.cls-4{opacity:0.2;}</style></defs><title>Asset 4</title><g class="cls-1"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><rect class="cls-2" width="28.35" height="113.39"/><rect class="cls-2" width="113.39" height="28.35"/><rect class="cls-3" x="113.39" y="28.35" width="28.35" height="113.39"/><rect class="cls-3" x="28.35" y="113.39" width="113.39" height="28.35"/><rect class="cls-4" y="113.39" width="28.35" height="28.35"/><rect class="cls-4" x="113.39" width="28.35" height="28.35"/></g></g></g></svg>
-        <img id="buttonlock" src="resources/tetrisbuttonlock.png" width="150" height="150">
+        <img id="buttonlock" src="resources/tetrisbuttonlock.png" alt="button lock" width="150" height="150">
       </div>
     </div>
     <canvas width="400" height="840" id="tetris"></canvas>
     <div id="shopdiv">
       <p id="totalscore">TOTAL SCORE: 0</p>
       <div id="upgradeshop">
-        <p id="shoptext">UPGRADES</p>
+        <p class="shoptext">UPGRADES</p>
         
       </div>
       <br><br>
       <div id="buildingshop">
-        <p id="shoptext">BUILDINGS</p>
+        <p class="shoptext">BUILDINGS</p>
         
       </div>
     </div>
