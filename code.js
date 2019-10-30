@@ -360,6 +360,16 @@ function update(time = 0) {
     if (dropCounter > dropInterval) {
       moveDown();
     }
+    
+    /* rendering */
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.height / ((arenaSize * 2.1 | 0) | 0), canvas.width / arenaSize);
+    drawMatrix(arena, 0, 0);
+    drawMatrix(player.tetrominos[0], player.x, player.y);
+    if (getUpgradeByName("ghostUpgrade").bought) {
+      drawGhostBlock();
+    }
+    
     let clearedRows = clearRows(arena);
     rows += clearedRows;
     level = Math.floor(rows / 10);
@@ -408,13 +418,6 @@ function update(time = 0) {
     screenText.textContent = "";
     screenText2.textContent = "";
     
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.height / ((arenaSize * 2.1 | 0) | 0), canvas.width / arenaSize);
-    drawMatrix(arena, 0, 0);
-    drawMatrix(player.tetrominos[0], player.x, player.y);
-    if (getUpgradeByName("ghostUpgrade").bought) {
-      drawGhostBlock();
-    }
   } else {
     screenText.textContent = "PAUSED";
     screenText2.textContent = "PRESS SPACE TO RESUME";
